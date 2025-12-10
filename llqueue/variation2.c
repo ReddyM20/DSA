@@ -23,7 +23,7 @@ Queue *initialize()
 
 int isEmpty(Queue *q)
 {
-    return q->front == NULL;
+    return q->rear == NULL;
 }
 
 void enqueue(Queue *q, int value)
@@ -37,12 +37,14 @@ void enqueue(Queue *q, int value)
 
     if (isEmpty(q))
     {
-        q->front = newNode;
         q->rear = newNode;
+        q->front = newNode;
+        newNode->next = newNode;
     }
     else
     {
-        q->rear->next = newNode;
+        newNode->next = q->rear;
+        q->front->next = newNode;
         q->rear = newNode;
     }
 }
@@ -52,12 +54,19 @@ int dequeue(Queue *q)
     if (isEmpty(q))
         return -1;
 
-    Node *temp = q->front;
+    Node *temp = q->rear;
     int value = temp->data;
-    q->front = q->front->next;
 
-    if (q->front == NULL)
+    if (q->rear == q->front)
+    {
         q->rear = NULL;
+        q->front = NULL;
+    }
+    else
+    {
+        q->rear = q->rear->next;
+        q->front->next = q->rear;
+    }
 
     free(temp);
     return value;
@@ -67,7 +76,7 @@ int front(Queue *q)
 {
     if (isEmpty(q))
         return -1;
-    return q->front->data;
+    return q->rear->data;
 }
 
 void display(Queue *q)
@@ -78,12 +87,12 @@ void display(Queue *q)
         return;
     }
 
-    Node *temp = q->front;
-    while (temp != NULL)
+    Node *temp = q->rear;
+    do
     {
         printf("%d ", temp->data);
         temp = temp->next;
-    }
+    } while (temp != q->rear);
     printf("\n");
 }
 
